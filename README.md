@@ -1,90 +1,111 @@
+
 # 🔐 SECURE PASSWORD ANALYZER
 
-A Python-based GUI application using Tkinter that analyzes password strength and security.
+Secure Password Analyzer is a powerful open-source security tooling project that helps individuals and teams evaluate password strength, detect weak or exposed credentials, and securely manage encrypted password vaults. It combines a FastAPI backend, a Next.js frontend, and an optional Electron desktop wrapper to provide a complete, audit-ready workflow for password analysis, storage, and retrieval.
 
-This tool checks:
-
-- Password complexity rules  
-- Personal information leakage (name, username, email, DOB)  
-- Common password blacklist  
-- Security scoring system  
+The project is designed for security-conscious developers, system administrators, and privacy-aware users who want a local, extensible solution to analyze password hygiene and safely store secrets.
 
 ---
 
 # 🚀 FEATURES
 
-- GUI-based interface using Tkinter  
-- Password strength scoring system upgraded to a 0–100 ML-backed scale  
-- Detects weak password patterns  
-- Checks personal information inside password:
-  - Name  
-  - Username  
-  - Email prefix  
-  - Date of birth  
-- Common password blacklist detection  
-- Detailed security report output  
-- Reset and retry functionality  
-- Backend FastAPI analysis endpoint: `/api/analysis/score`  
+- **Comprehensive password analysis**: Multi-factor checks including length, complexity, pattern detection, and blacklist comparisons.
+- **Personal information detection**: Flags passwords that contain user attributes such as name, username, email prefix, or date-of-birth patterns.
+- **Common-password blacklist**: Uses a curated list of frequently-used and easily-guessable passwords to detect risky choices.
+- **Scoring system**: Produces clear strength scores and labels to help users understand risk and remediation steps.
+- **Vault management**: Create encrypted vaults, add entries, and decrypt with a master password.
+- **Authentication + 2FA**: Built-in account registration, login, and optional TOTP-based multi-factor authentication.
+- **Programmatic API**: FastAPI backend exposes analysis endpoints for integration and automation (`/api/analysis/score`).
+- **AI assistant**: An optional assistant endpoint that can provide contextual recommendations and password hardening tips.
+- **Cross-platform desktop option**: Electron wrapper for users who prefer a packaged local application.
+- **Extensible architecture**: Clear separation of frontend, backend, and services to simplify feature additions and security reviews.
+
+This feature set makes the project useful for real-world password auditing, user training, and as a foundation for larger secrets-management systems.
 
 ---
 
 # 🧠 HOW IT WORKS
 
-## 🔹 Complexity Check
-- Minimum length (8+ characters)  
-- Uppercase letter check  
-- Lowercase letter check  
-- Digit check  
-- Special character check  
+The Secure Password Analyzer assesses and manages passwords through a modular pipeline:
+
+- **Client input**: The Next.js frontend (or Electron UI) collects passwords and optional account metadata.
+- **API request**: The frontend calls the FastAPI backend endpoints (for analysis, vault actions, auth, and assistant queries).
+- **Validation & auth**: Authentication, registration, and TOTP flows are handled by the backend services and JWT utilities.
+- **Analysis pipeline**:
+  - Complexity checks: minimum length, uppercase, lowercase, digits, and special characters.
+  - Pattern detection: repeated characters, sequential patterns, and common weak patterns.
+  - Personal-information scan: checks for name, username, email prefix, and date-of-birth fragments.
+  - Blacklist comparison: against `common_passwords.txt` and other curated lists.
+  - Scoring aggregation: a composite score is computed and normalized to human-friendly labels (WEAK / MEDIUM / STRONG).
+- **Reporting**: Backend returns a structured analysis result and suggested remediation steps.
+- **Vault operations**: Encrypted entries are stored in the backend database; decryption requires the user's master password and enforces access controls.
+- **Optional AI guidance**: The assistant service can analyze results and return tailored recommendations.
 
 ---
 
 ## 🔹 Personal Information Check
-The system checks if password contains:
 
-- User's name  
-- Username  
-- Email prefix  
-- Date of birth  
+This check inspects whether a candidate password contains fragments or exact matches of personal attributes that significantly weaken security:
 
----
+- **Fields inspected**: user full name, username, email local part (before @), and common date formats (YYYY, YY, MMDD, DDMM, YYYYMMDD).
+- **Matching strategy**: exact substring matches, common leetspeak substitutions (e.g., 0→o, 1→l), and normalized whitespace/punctuation removal to surface disguised matches.
+- **Impact on score**: detected personal information reduces the overall strength score and is flagged prominently in the analysis report with mitigation advice (avoid names, dates, and reuse of identifiable tokens).
 
-## 🔹 Common Password Check
-Compares password with a known list of weak/common passwords.
+This helps prevent easy targeted-guess attacks and social-engineering vulnerabilities.
 
 ---
 
 # 📁 PROJECT STRUCTURE
 
-SecurePasswordAnalyzer/
+Top-level layout (abridged):
 
-- main.py  
-- common_passwords.txt  
-- requirements.txt  
-- README.md
-- screenshot.png  
+- `backend/` — FastAPI backend and services
+  - `app/main.py` — FastAPI application entry
+  - `app/api/` — API route modules (analysis, assistant, auth, otp, vault)
+  - `app/services/` — Business logic and helpers (analysis pipeline, encryption, jwt, otp, password utilities)
+  - `app/models/` — ORM/data models (users, vault entries, audit logs)
+  - `app/schemas/` — Pydantic request/response schemas
+  - `database/` — DB connection utilities
+
+- `frontend/` — Next.js React application
+  - `app/` — pages and routing (login, 2fa, assistant, vault pages)
+  - `components/` — UI components (Button, Card, FormField, Modal)
+  - `lib/` — client helpers (API client, utils)
+
+- `electron/` — Optional Electron wrapper for desktop packaging
+
+- project root files: `main.py`, `common_passwords.txt`, `README.md`, and repository-level scripts
+
+This separation makes it straightforward to review security-sensitive code (backend services and encryption) independently from UI concerns.
 
 ---
 
 # 📦 REQUIREMENTS
 
-This project now includes a FastAPI backend and a Next.js frontend.
+Minimum supported platforms and tooling:
 
-Backend requirements:
-- Python 3.11+ (recommended)
-- `pip` for Python package installation
+- Backend
+  - Python 3.11+
+  - Recommended: a virtual environment (`venv` or similar)
+  - Install with: `pip install -r backend/requirements.txt`
 
-Frontend requirements:
-- Node.js 20+
-- npm or yarn
+- Frontend
+  - Node.js 20+ and npm or yarn
+  - Install with: `npm install` (run in `frontend/`)
 
----
+- Desktop wrapper (optional)
+  - Node.js + Electron build toolchain (see `electron/package.json`)
 
-# ⚙️ INSTALLATION & USAGE
+- Runtime ports
+  - Backend default: `127.0.0.1:8000` (FastAPI /uvicorn)
+  - Frontend default: `127.0.0.1:3000` (Next.js dev server)
 
-## Backend
 
-1. Open PowerShell in the repository root:
+# 🚀 Installation (How to use it)
+
+## 1. Backend (from repository root):
+
+1. Open PowerShell or CMD in the repository root:
    `cd d:\SecurePass-Analyzer`
 2. Activate the Python virtual environment:
    `.\.venv\Scripts\Activate`
@@ -95,9 +116,9 @@ Frontend requirements:
 5. Confirm the backend is running at:
    `http://127.0.0.1:8000`
 
-## Frontend
+## 2. Frontend (in a separate terminal):
 
-1. Open PowerShell in the frontend folder:
+1. Open PowerShell or CMD in the frontend folder:
    `cd d:\SecurePass-Analyzer\frontend`
 2. Install frontend dependencies:
    `npm install`
@@ -106,11 +127,17 @@ Frontend requirements:
 4. Open the app in your browser at:
    `http://127.0.0.1:3000`
 
-## Desktop wrapper (optional)
+## 3. Desktop Electron Wrapper (optional):
 
-A desktop Electron wrapper exists under `electron/` if you want a packaged app.
+```powershell
+cd d:\SecurePass-Analyzer\electron
+npm install
+# follow package.json scripts to build/package
+```
 
-## UX Instructions
+---
+
+# 💻 UX Instructions
 
 1. Open the frontend at `http://127.0.0.1:3000`.
 2. Go to **Login** and register a new account with email and a strong master password.
@@ -122,18 +149,19 @@ A desktop Electron wrapper exists under `electron/` if you want a packaged app.
 
 ---
 
-# �️ TROUBLESHOOTING
 
-- If `uvicorn` is not found, ensure the virtual environment is activated and run `pip install -r backend/requirements.txt`.
-- If `next` is not recognized, run `npm install` from `d:\SecurePass-Analyzer\frontend` and try `npm run dev` again.
-- If the frontend cannot reach the backend, confirm `NEXT_PUBLIC_API_BASE` is set to `http://127.0.0.1:8000/api` and both servers are running.
-- If login fails with a 401 error after registration, clear browser local storage and re-login.
-- If 2FA setup returns an invalid code error, verify the TOTP app is synced and use the current code.
-- If `npm install` reports vulnerabilities, run `npm audit fix` for safe fixes and `npm audit` to review remaining warnings before upgrading packages.
+
+## ⚙️ TROUBLESHOOTING & SECURITY NOTES
+
+- If `uvicorn` is not found, confirm your virtual environment is active and dependencies are installed.
+- If the frontend cannot reach the backend, verify `NEXT_PUBLIC_API_BASE` is set to `http://127.0.0.1:8000/api` in the frontend environment.
+- For reproducible deployments, pin backend dependencies and run security audits (`pip-audit`, `npm audit`).
+- Keep secret material out of version control. Use environment variables for keys and secrets.
+- The password blacklist is derived from public SecLists data; review and update `common_passwords.txt` periodically.
 
 ---
 
-# 🔐 RECOMMENDED SECURITY
+## 🔐 RECOMMENDED SECURITY
 
 - Keep backend dependencies current and rerun `pip install -r backend/requirements.txt` after updates.
 - Use a virtual environment for Python to isolate backend packages.
@@ -153,51 +181,25 @@ This dataset is widely used in cybersecurity research and penetration testing.
 
 ---
 
-# 🛡️ PASSWORD SCORING SYSTEM
-
-Length ≥ 8 → +1  
-Uppercase → +1  
-Lowercase → +1  
-Digit → +1  
-Special character → +1  
-Personal info found → -2  
-Common password found → -2  
-
----
-
-# 📌 STRENGTH LEVELS
-
-0–2 → WEAK  
-3–4 → MEDIUM  
-5+ → STRONG  
-
----
-
-# 🚀 FUTURE IMPROVEMENTS
-
-- Progress bar strength meter  
-- Real-time password checking  
-- Dark mode UI  
-- Export report as PDF  
-- Password history tracking  
-
----
-
 # 👨‍💻 AUTHOR
 
-MD Sami Akhlaq
-
+# 1. MD Sami Akhlaq (Creator)
+- Created the main Security engine.
 - 🔗 LinkedIn: https://www.linkedin.com/in/md-sami-akhlaq-2838b0334/  
 - 🔗 Facebook: https://www.facebook.com/say.yashh 
 
-# This project was built for learning purposes to understand:
-
-- Python GUI development (Tkinter)  
-- Password security concepts  
-- Basic cybersecurity principles  
-
+# 2. Ahnaf Wasi Azad (Full stack developer)
+- Created the entire forntend, backend and the desktop wrapper
+- implemented database
+- security checks
+- improved the overall tool
+- 🔗 Email : ahnafasi.awa@gmail.com
+- 🔗 Github : https://github.com/Illuminisimer
+- 🔗 Facebook : https://www.facebook.com/Illuminisimer
 ---
 
 # 📜 LICENSE
 
 MIT License recommended for open-source use.
+
+---
