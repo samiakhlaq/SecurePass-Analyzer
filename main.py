@@ -1,11 +1,11 @@
 import tkinter as tk
 
-# ---------------- WINDOW ----------------
+# WINDOW 
 root = tk.Tk()
 root.title("Secure Password Analyzer")
 root.geometry("600x600")
 
-# ---------------- INPUT FIELDS ----------------
+# INPUT FIELDS 
 tk.Label(root, text="Full Name").pack()
 name_entry = tk.Entry(root)
 name_entry.pack()
@@ -26,11 +26,11 @@ tk.Label(root, text="Password").pack()
 password_entry = tk.Entry(root, show="*")
 password_entry.pack()
 
-# ---------------- OUTPUT BOX ----------------
+#  OUTPUT BOX 
 output = tk.Text(root, height=25, width=70)
 output.pack()
 
-# ---------------- CHECK PASSWORD ----------------
+# CHECK PASSWORD
 def check_password():
     password = password_entry.get()
     name = name_entry.get().lower()
@@ -44,7 +44,7 @@ def check_password():
     output.insert(tk.END, "🔐 PASSWORD SECURITY REPORT\n")
     output.insert(tk.END, "================================\n")
 
-    # ---------------- BASIC CHECKS ----------------
+    #  BASIC CHECKS 
     if len(password) >= 8:
         score += 1
         output.insert(tk.END, "✔ Length OK\n")
@@ -76,7 +76,7 @@ def check_password():
     else:
         output.insert(tk.END, "✘ Missing special character\n")
 
-    # ---------------- COMMON PASSWORD CHECK ----------------
+    #  COMMON PASSWORD CHECK 
     output.insert(tk.END, "\n--- Common Password Check ---\n")
 
     try:
@@ -92,7 +92,7 @@ def check_password():
     except FileNotFoundError:
         output.insert(tk.END, "⚠ common_passwords.txt not found\n")
 
-    # ---------------- PERSONAL INFO CHECK ----------------
+    #  PERSONAL INFO CHECK 
     output.insert(tk.END, "\n--- Personal Info Check ---\n")
 
     email_prefix = email.split("@")[0] if "@" in email else email
@@ -135,7 +135,7 @@ def check_password():
     else:
         output.insert(tk.END, "✔ No Personal Info Found (Safe)\n")
 
-    # ---------------- FINAL SCORE ----------------
+    #  FINAL SCORE 
     output.insert(tk.END, "\n================================\n")
     output.insert(tk.END, f"Score: {score}/5\n")
 
@@ -146,16 +146,16 @@ def check_password():
     else:
         output.insert(tk.END, "Strength: STRONG\n")
 
-# ---------------- RESET FUNCTION ----------------
+#  RESET FUNCTION
 def reset():
     password_entry.delete(0, tk.END)
     output.delete("1.0", tk.END)
     password_entry.focus()
 
-# ---------------- BUTTONS ----------------
+#  BUTTONS 
 tk.Button(root, text="Check Password", command=check_password).pack(pady=5)
 tk.Button(root, text="Check Again", command=reset).pack(pady=5)
 tk.Button(root, text="Quit", command=root.quit).pack(pady=5)
 
-# ---------------- RUN ----------------
+#  RUN 
 root.mainloop()
